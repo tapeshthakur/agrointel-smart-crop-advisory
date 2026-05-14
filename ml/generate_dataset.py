@@ -1,0 +1,65 @@
+import pandas as pd
+import numpy as np
+
+np.random.seed(42)
+
+crops = {
+    "rice": {"N": (80, 100), "P": (35, 60), "K": (35, 50),
+             "temp": (20, 30), "humidity": (75, 90),
+             "ph": (5.5, 7.5), "rainfall": (200, 300)},
+    
+    "maize": {"N": (50, 80), "P": (30, 50), "K": (30, 50),
+              "temp": (22, 32), "humidity": (50, 70),
+              "ph": (5.5, 7.5), "rainfall": (100, 200)},
+    
+    "chickpea": {"N": (20, 50), "P": (40, 70), "K": (40, 60),
+                 "temp": (18, 28), "humidity": (50, 65),
+                 "ph": (6.0, 8.0), "rainfall": (60, 120)},
+    
+    "coffee": {"N": (20, 40), "P": (30, 50), "K": (25, 45),
+               "temp": (18, 26), "humidity": (50, 70),
+               "ph": (5.5, 6.5), "rainfall": (60, 120)},
+    
+    "wheat": {"N": (40, 60), "P": (40, 60), "K": (45, 60),
+              "temp": (15, 25), "humidity": (60, 75),
+              "ph": (6.0, 7.5), "rainfall": (100, 180)}
+}
+
+rows_per_crop = 100
+data = []
+
+for crop, ranges in crops.items():
+    for _ in range(rows_per_crop):
+        N = np.random.uniform(*ranges["N"])
+        P = np.random.uniform(*ranges["P"])
+        K = np.random.uniform(*ranges["K"])
+        temp = np.random.uniform(*ranges["temp"])
+        humidity = np.random.uniform(*ranges["humidity"])
+        ph = np.random.uniform(*ranges["ph"])
+        rainfall = np.random.uniform(*ranges["rainfall"])
+
+        # Irrigation estimation logic (domain-based heuristic)
+        irrigation_requirement = max(
+            0,
+            round((temp * 0.3 + rainfall * 0.02 - humidity * 0.1), 2)
+        )
+
+        data.append([
+            round(N, 2), round(P, 2), round(K, 2),
+            round(temp, 2), round(humidity, 2),
+            round(ph, 2), round(rainfall, 2),
+            crop, irrigation_requirement
+        ])
+
+columns = [
+    "N", "P", "K",
+    "temperature", "humidity",
+    "ph", "rainfall",
+    "label", "irrigation_requirement"
+]
+
+df = pd.DataFrame(data, columns=columns)
+df.to_csv("crop_recommendation.csv", index=False)
+
+print("Dataset generated successfully: crop_recommendation.csv")
+print("Total rows:", len(df))

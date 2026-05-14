@@ -1,0 +1,14 @@
+{
+  "model": "MobileNetV2 transfer learning",
+  "dataset_dir": "D:\\Project\\smart-crop-advisory-systemold\\backend\\data\\PlantVillage",
+  "classes": 16,
+  "image_size": [
+    224,
+    224
+  ],
+  "validation_accuracy": 0.4884,
+  "validation_loss": 1.1422,
+  "trained_at": "20260417_143959",
+  "model_path": "D:\\Project\\smart-crop-advisory-systemold\\ml\\models\\disease_cnn.keras",
+  "class_names_path": "D:\\Project\\smart-crop-advisory-systemold\\ml\\models\\disease_class_names.json"
+}

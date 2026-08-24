@@ -39,7 +39,7 @@ function SignupPage() {
       setSuccess(t("signup.success"));
       setTimeout(() => navigate("/login"), 1200);
     } catch (err) {
-      setError(err.response?.data?.error || "Signup failed.");
+      setError(err.response?.data?.error || t("signup.failed"));
     } finally {
       setLoading(false);
     }
@@ -49,32 +49,32 @@ function SignupPage() {
     <main className="mx-auto flex min-h-[82vh] w-full max-w-7xl items-center px-4 py-10 sm:px-6 lg:px-8">
       <section className="grid w-full gap-6 lg:grid-cols-[0.9fr,1.1fr]">
         <div className="surface-card-highlight p-8 lg:p-10">
-          <span className="section-badge">Create Profile</span>
-          <h1 className="mt-5 text-4xl font-bold leading-tight text-emerald-50">{t("signup.title")}</h1>
-          <p className="mt-4 max-w-xl text-base leading-8 text-emerald-100/78">{t("signup.subtitle")}</p>
+          <span className="section-badge">{t("signup.badge")}</span>
+          <h1 className="mt-5 text-4xl font-bold leading-tight text-text-heading">{t("signup.title")}</h1>
+          <p className="mt-4 max-w-xl text-base leading-8 text-text-muted">{t("signup.subtitle")}</p>
 
           <div className="mt-8 grid gap-4">
             <div className="surface-card-soft p-4">
-              <p className="text-sm font-semibold text-lime-200">Farmer access</p>
-              <p className="mt-2 text-sm leading-6 text-emerald-100/70">Use the crop, disease, market, and recent predictions modules with simple farmer-friendly inputs.</p>
+              <p className="text-sm font-semibold text-accent-700">{t("signup.farmerAccess")}</p>
+              <p className="mt-2 text-sm leading-6 text-text-muted">{t("signup.farmerAccessDesc")}</p>
             </div>
             <div className="surface-card-soft p-4">
-              <p className="text-sm font-semibold text-lime-200">Admin access</p>
-              <p className="mt-2 text-sm leading-6 text-emerald-100/70">Monitor performance metrics, model outcomes, and platform-level analytics for project evaluation.</p>
+              <p className="text-sm font-semibold text-accent-700">{t("signup.adminAccess")}</p>
+              <p className="mt-2 text-sm leading-6 text-text-muted">{t("signup.adminAccessDesc")}</p>
             </div>
           </div>
         </div>
 
         <section className="surface-card p-8 lg:p-10">
           <div className="max-w-xl">
-            <span className="section-badge">Registration</span>
-            <h2 className="mt-5 text-3xl font-semibold text-emerald-50">{t("signup.title")}</h2>
-            <p className="mt-2 text-sm leading-6 text-emerald-100/68">{t("signup.subtitle")}</p>
+            <span className="section-badge">{t("signup.formBadge")}</span>
+            <h2 className="mt-5 text-3xl font-semibold text-text-heading">{t("signup.title")}</h2>
+            <p className="mt-2 text-sm leading-6 text-text-muted">{t("signup.subtitle")}</p>
           </div>
 
           <form className="mt-8 space-y-5" onSubmit={handleSubmit}>
             <label className="block space-y-2">
-              <span className="text-sm font-medium text-emerald-100">{t("signup.name")}</span>
+              <span className="text-sm font-medium text-text-muted">{t("signup.name")}</span>
               <input
                 type="text"
                 value={form.name}
@@ -86,19 +86,19 @@ function SignupPage() {
             </label>
 
             <label className="block space-y-2">
-              <span className="text-sm font-medium text-emerald-100">{t("signup.email")}</span>
+              <span className="text-sm font-medium text-text-muted">{t("signup.email")}</span>
               <input
                 type="email"
                 value={form.email}
                 onChange={(e) => handleChange("email", e.target.value)}
                 required
                 className="field-shell"
-                placeholder="you@example.com"
+                placeholder={t("signup.emailPlaceholder")}
               />
             </label>
 
             <label className="block space-y-2">
-              <span className="text-sm font-medium text-emerald-100">{t("signup.password")}</span>
+              <span className="text-sm font-medium text-text-muted">{t("signup.password")}</span>
               <input
                 type="password"
                 value={form.password}
@@ -111,7 +111,7 @@ function SignupPage() {
             </label>
 
             <label className="block space-y-2">
-              <span className="text-sm font-medium text-emerald-100">{t("signup.role")}</span>
+              <span className="text-sm font-medium text-text-muted">{t("signup.role")}</span>
               <ThemedSelect
                 value={form.role}
                 onChange={(nextRole) => handleChange("role", nextRole)}
@@ -122,17 +122,17 @@ function SignupPage() {
               />
             </label>
 
-            {error ? <p className="rounded-2xl border border-red-300/30 bg-red-500/10 px-4 py-3 text-sm text-red-200">{error}</p> : null}
-            {success ? <p className="rounded-2xl border border-lime-300/30 bg-lime-500/10 px-4 py-3 text-sm text-lime-200">{success}</p> : null}
+            {error ? <p className="rounded-2xl border border-danger-100 bg-danger-50 px-4 py-3 text-sm text-danger-700">{error}</p> : null}
+            {success ? <p className="rounded-2xl border border-accent-300 bg-success-50 px-4 py-3 text-sm text-accent-700">{success}</p> : null}
 
             <button type="submit" disabled={loading} className="theme-button-primary w-full px-4 py-3 disabled:opacity-70">
               {loading ? t("signup.loading") : t("signup.button")}
             </button>
           </form>
 
-          <p className="mt-6 text-sm text-emerald-100/80">
+          <p className="mt-6 text-sm text-text-muted">
             {t("signup.already")}{" "}
-            <Link to="/login" className="font-semibold text-lime-200 hover:text-lime-100">
+            <Link to="/login" className="font-semibold text-accent-700 hover:text-accent-800">
               {t("nav.login")}
             </Link>
           </p>

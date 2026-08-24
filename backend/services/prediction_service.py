@@ -76,6 +76,7 @@ def predict_crop(input_data: Dict[str, Any], user_id: int | None = None) -> Dict
     _safe_log_prediction(
         input_payload=cleaned_input,
         crop_prediction=str(predicted_class),
+        crop_confidence=confidence,
         irrigation_prediction=None,
         user_id=user_id,
     )
@@ -97,6 +98,7 @@ def predict_irrigation(input_data: Dict[str, Any], user_id: int | None = None) -
     _safe_log_prediction(
         input_payload=cleaned_input,
         crop_prediction=None,
+        crop_confidence=None,
         irrigation_prediction=prediction,
         user_id=user_id,
     )
@@ -106,6 +108,7 @@ def predict_irrigation(input_data: Dict[str, Any], user_id: int | None = None) -
 def _safe_log_prediction(
     input_payload: Dict[str, Any],
     crop_prediction: str | None,
+    crop_confidence: float | None,
     irrigation_prediction: float | None,
     user_id: int | None,
 ) -> None:
@@ -114,6 +117,7 @@ def _safe_log_prediction(
         insert_prediction(
             input_payload=input_payload,
             crop_prediction=crop_prediction,
+            crop_confidence=crop_confidence,
             irrigation_prediction=irrigation_prediction,
             user_id=user_id,
         )

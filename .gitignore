@@ -1,7 +1,18 @@
 venv/
+.venv/
 node_modules/
 __pycache__/
 .env
 dist/
 build/
 *.pyc
+server.*.log
+
+# Runtime / temporary files
+tmp/
+*.db
+*.sqlite
+*.sqlite3
+
+# Testing cache
+.pytest_cache/

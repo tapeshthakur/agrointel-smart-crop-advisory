@@ -13,6 +13,7 @@ EXPECTED_PREDICTION_COLUMNS = [
     "timestamp",
     "input_data",
     "crop_prediction",
+    "crop_confidence",
     "irrigation_prediction",
     "user_id",
 ]
@@ -45,6 +46,7 @@ def _migrate_predictions_table(conn: sqlite3.Connection) -> None:
                     timestamp TEXT NOT NULL,
                     input_data TEXT NOT NULL,
                     crop_prediction TEXT,
+                    crop_confidence REAL,
                     irrigation_prediction REAL,
                     user_id INTEGER,
                     FOREIGN KEY (user_id) REFERENCES users(id)
@@ -56,11 +58,14 @@ def _migrate_predictions_table(conn: sqlite3.Connection) -> None:
             select_user_id = "NULL"
             if "user_id" in legacy_columns:
                 select_user_id = "user_id"
+            select_crop_confidence = "NULL"
+            if "crop_confidence" in legacy_columns:
+                select_crop_confidence = "crop_confidence"
 
             conn.execute(
                 f"""
-                INSERT INTO predictions (id, timestamp, input_data, crop_prediction, irrigation_prediction, user_id)
-                SELECT id, timestamp, input_data, crop_prediction, irrigation_prediction, {select_user_id}
+                INSERT INTO predictions (id, timestamp, input_data, crop_prediction, crop_confidence, irrigation_prediction, user_id)
+                SELECT id, timestamp, input_data, crop_prediction, {select_crop_confidence}, irrigation_prediction, {select_user_id}
                 FROM {backup_name}
                 """
             )
@@ -73,6 +78,7 @@ def _migrate_predictions_table(conn: sqlite3.Connection) -> None:
             timestamp TEXT NOT NULL,
             input_data TEXT NOT NULL,
             crop_prediction TEXT,
+            crop_confidence REAL,
             irrigation_prediction REAL,
             user_id INTEGER,
             FOREIGN KEY (user_id) REFERENCES users(id)
@@ -172,6 +178,7 @@ def get_user_count() -> int:
 def insert_prediction(
     input_payload: Dict[str, Any],
     crop_prediction: Optional[str] = None,
+    crop_confidence: Optional[float] = None,
     irrigation_prediction: Optional[float] = None,
     user_id: Optional[int] = None,
 ) -> int:
@@ -189,12 +196,13 @@ def insert_prediction(
                 timestamp,
                 input_data,
                 crop_prediction,
+                crop_confidence,
                 irrigation_prediction,
                 user_id
             )
-            VALUES (?, ?, ?, ?, ?)
+            VALUES (?, ?, ?, ?, ?, ?)
             """,
-            (timestamp, input_json, crop_prediction, irrigation_prediction, user_id),
+            (timestamp, input_json, crop_prediction, crop_confidence, irrigation_prediction, user_id),
         )
         conn.commit()
         return int(cursor.lastrowid)
@@ -202,7 +210,7 @@ def insert_prediction(
 
 def _get_predictions(limit: int = 20, user_id: Optional[int] = None) -> List[Dict[str, Any]]:
     query = """
-        SELECT id, timestamp, input_data, crop_prediction, irrigation_prediction, user_id
+        SELECT id, timestamp, input_data, crop_prediction, crop_confidence, irrigation_prediction, user_id
         FROM predictions
     """
     params: List[Any] = []
@@ -232,6 +240,7 @@ def _get_predictions(limit: int = 20, user_id: Optional[int] = None) -> List[Dic
                 "timestamp": row["timestamp"],
                 "input_data": input_data,
                 "crop_prediction": row["crop_prediction"],
+                "crop_confidence": row["crop_confidence"],
                 "irrigation_prediction": row["irrigation_prediction"],
                 "user_id": row["user_id"],
             }

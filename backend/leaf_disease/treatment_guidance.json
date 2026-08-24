@@ -1,0 +1,177 @@
+{
+  "_default": {
+    "description": "Leaf symptoms require local confirmation before treatment.",
+    "severity": "unknown",
+    "treatment": "Retake a clear close-up photo of one affected leaf and confirm with a local agriculture officer before spraying."
+  },
+  "_low_confidence": {
+    "description": "The model could not confidently identify the disease from this photo.",
+    "severity": "unknown",
+    "treatment": "Upload a sharper leaf-only image in natural light. Avoid mixed crops, fruit, soil, hands, or blurred backgrounds."
+  },
+  "Apple___Apple_scab": {
+    "description": "Fungal apple scab causing dark leaf spots and fruit blemishes.",
+    "severity": "medium",
+    "treatment": "Remove infected debris and use a locally recommended protectant fungicide at the advised interval."
+  },
+  "Apple___Black_rot": {
+    "description": "Fungal black rot affecting leaves, fruit, and cankers.",
+    "severity": "high",
+    "treatment": "Prune infected twigs, destroy fallen leaves and fruit, and follow local fungicide guidance."
+  },
+  "Apple___Cedar_apple_rust": {
+    "description": "Rust disease with orange-yellow leaf lesions.",
+    "severity": "medium",
+    "treatment": "Remove nearby alternate hosts where possible and use a recommended rust fungicide during risk periods."
+  },
+  "Apple___healthy": {
+    "description": "No major disease symptoms detected.",
+    "severity": "low",
+    "treatment": "No chemical treatment required. Continue regular monitoring and balanced irrigation."
+  },
+  "Blueberry___healthy": {
+    "description": "No major disease symptoms detected.",
+    "severity": "low",
+    "treatment": "Continue field monitoring and maintain good drainage."
+  },
+  "Cherry_(including_sour)___Powdery_mildew": {
+    "description": "Powdery mildew causing white fungal growth and leaf distortion.",
+    "severity": "medium",
+    "treatment": "Improve airflow, remove infected leaves, and apply a recommended mildew fungicide if spread continues."
+  },
+  "Cherry_(including_sour)___healthy": {
+    "description": "No major disease symptoms detected.",
+    "severity": "low",
+    "treatment": "No chemical treatment required. Keep monitoring new growth."
+  },
+  "Corn_(maize)___Cercospora_leaf_spot Gray_leaf_spot": {
+    "description": "Gray leaf spot in maize, usually favored by humid weather.",
+    "severity": "medium",
+    "treatment": "Use resistant varieties, crop rotation, residue management, and local fungicide advice for severe cases."
+  },
+  "Corn_(maize)___Common_rust_": {
+    "description": "Maize common rust with reddish-brown pustules.",
+    "severity": "medium",
+    "treatment": "Monitor spread and use a recommended fungicide only when infection is severe or early in crop stage."
+  },
+  "Corn_(maize)___Northern_Leaf_Blight": {
+    "description": "Maize northern leaf blight with elongated gray-green lesions.",
+    "severity": "high",
+    "treatment": "Use resistant hybrids, remove infected residue, rotate crops, and consult local fungicide guidance."
+  },
+  "Corn_(maize)___healthy": {
+    "description": "No major disease symptoms detected.",
+    "severity": "low",
+    "treatment": "No chemical treatment required. Continue scouting during humid periods."
+  },
+  "Grape___Black_rot": {
+    "description": "Grape black rot causing dark leaf lesions and fruit rot.",
+    "severity": "high",
+    "treatment": "Remove infected fruit and leaves, improve canopy airflow, and follow local fungicide schedules."
+  },
+  "Grape___Esca_(Black_Measles)": {
+    "description": "Esca complex causing interveinal striping and berry symptoms.",
+    "severity": "high",
+    "treatment": "Prune infected wood, sanitize tools, avoid vine stress, and seek local vineyard advice."
+  },
+  "Grape___Leaf_blight_(Isariopsis_Leaf_Spot)": {
+    "description": "Grape leaf blight with angular brown lesions.",
+    "severity": "medium",
+    "treatment": "Remove infected leaves, improve ventilation, and apply recommended fungicide if disease spreads."
+  },
+  "Grape___healthy": {
+    "description": "No major disease symptoms detected.",
+    "severity": "low",
+    "treatment": "Continue monitoring canopy health."
+  },
+  "Orange___Haunglongbing_(Citrus_greening)": {
+    "description": "Citrus greening symptoms can include mottled yellow leaves and weak growth.",
+    "severity": "high",
+    "treatment": "Remove infected trees where advised, control psyllid vectors, and contact local citrus extension support."
+  },
+  "Peach___Bacterial_spot": {
+    "description": "Bacterial spot causing dark lesions and shot-hole symptoms.",
+    "severity": "medium",
+    "treatment": "Use resistant varieties, avoid overhead irrigation, and follow local copper/bactericide recommendations."
+  },
+  "Peach___healthy": {
+    "description": "No major disease symptoms detected.",
+    "severity": "low",
+    "treatment": "Continue regular scouting."
+  },
+  "Pepper__bell___Bacterial_spot": {
+    "description": "Bacterial spot in bell pepper causing dark water-soaked leaf lesions.",
+    "severity": "high",
+    "treatment": "Remove badly infected leaves, avoid overhead irrigation, and use copper-based treatment only as locally advised."
+  },
+  "Pepper__bell___healthy": {
+    "description": "No major disease symptoms detected.",
+    "severity": "low",
+    "treatment": "No chemical treatment required. Maintain balanced moisture and airflow."
+  },
+  "Potato___Early_blight": {
+    "description": "Early blight causing concentric brown leaf spots.",
+    "severity": "medium",
+    "treatment": "Remove infected foliage, avoid leaf wetness, rotate crops, and use recommended fungicide if symptoms spread."
+  },
+  "Potato___Late_blight": {
+    "description": "Late blight can spread rapidly under cool, humid conditions.",
+    "severity": "high",
+    "treatment": "Isolate affected plants, destroy infected foliage safely, and contact local extension support urgently."
+  },
+  "Potato___healthy": {
+    "description": "No major disease symptoms detected.",
+    "severity": "low",
+    "treatment": "No chemical treatment required. Keep scouting during wet weather."
+  },
+  "Tomato_Bacterial_spot": {
+    "description": "Bacterial spot in tomato causing small dark lesions.",
+    "severity": "high",
+    "treatment": "Remove infected leaves, avoid overhead watering, and use locally recommended copper treatment if needed."
+  },
+  "Tomato_Early_blight": {
+    "description": "Early blight causing target-like brown leaf spots.",
+    "severity": "medium",
+    "treatment": "Remove infected lower leaves, mulch to reduce splash, and use recommended fungicide if disease spreads."
+  },
+  "Tomato_Late_blight": {
+    "description": "Late blight is a fast-spreading tomato disease in humid weather.",
+    "severity": "high",
+    "treatment": "Remove infected plants carefully, avoid leaf wetness, and seek urgent local extension advice."
+  },
+  "Tomato_Leaf_Mold": {
+    "description": "Leaf mold favored by high humidity and poor ventilation.",
+    "severity": "medium",
+    "treatment": "Improve airflow, reduce humidity, remove infected leaves, and follow local fungicide guidance."
+  },
+  "Tomato_Septoria_leaf_spot": {
+    "description": "Septoria leaf spot causing many small circular spots on lower leaves.",
+    "severity": "medium",
+    "treatment": "Remove infected leaves, avoid splashing water, mulch soil, and rotate crops."
+  },
+  "Tomato_Spider_mites_Two_spotted_spider_mite": {
+    "description": "Spider mite damage causing stippling, yellowing, and webbing.",
+    "severity": "medium",
+    "treatment": "Wash leaf undersides, reduce dust stress, and use a locally recommended miticide only when needed."
+  },
+  "Tomato__Target_Spot": {
+    "description": "Target spot causing circular lesions with rings.",
+    "severity": "medium",
+    "treatment": "Remove infected leaves, improve spacing, and use recommended fungicide if symptoms advance."
+  },
+  "Tomato__Tomato_YellowLeaf__Curl_Virus": {
+    "description": "Viral leaf curl causing yellowing, curling, and stunted growth.",
+    "severity": "high",
+    "treatment": "Remove severely infected plants and control whiteflies. Chemical treatment will not cure infected plants."
+  },
+  "Tomato__Tomato_mosaic_virus": {
+    "description": "Mosaic virus causing mottled leaves and distorted growth.",
+    "severity": "high",
+    "treatment": "Remove infected plants, sanitize tools, and avoid handling healthy plants after touching infected ones."
+  },
+  "Tomato_healthy": {
+    "description": "No major disease symptoms detected.",
+    "severity": "low",
+    "treatment": "No chemical treatment required. Continue regular field monitoring."
+  }
+}

@@ -1,0 +1,73 @@
+{
+  "model": "MobileNetV2 transfer learning",
+  "dataset_dir": "D:\\Project\\smart-crop-advisory-system\\backend\\data\\PlantVillage\\PlantVillage",
+  "classes": 15,
+  "class_distribution": {
+    "Pepper__bell___Bacterial_spot": 997,
+    "Pepper__bell___healthy": 1478,
+    "Potato___Early_blight": 1000,
+    "Potato___healthy": 152,
+    "Potato___Late_blight": 1000,
+    "Tomato__Target_Spot": 1404,
+    "Tomato__Tomato_mosaic_virus": 373,
+    "Tomato__Tomato_YellowLeaf__Curl_Virus": 3208,
+    "Tomato_Bacterial_spot": 2127,
+    "Tomato_Early_blight": 1000,
+    "Tomato_healthy": 1591,
+    "Tomato_Late_blight": 1909,
+    "Tomato_Leaf_Mold": 952,
+    "Tomato_Septoria_leaf_spot": 1771,
+    "Tomato_Spider_mites_Two_spotted_spider_mite": 1676
+  },
+  "class_weights": {
+    "0": 1.380007,
+    "1": 0.930898,
+    "2": 1.375867,
+    "3": 1.375867,
+    "4": 9.051754,
+    "5": 0.646858,
+    "6": 1.375867,
+    "7": 0.720726,
+    "8": 1.445238,
+    "9": 0.776887,
+    "10": 0.820923,
+    "11": 0.979962,
+    "12": 0.428886,
+    "13": 3.688651,
+    "14": 0.864781
+  },
+  "image_size": [
+    224,
+    224
+  ],
+  "validation_accuracy": 0.8871,
+  "validation_loss": 0.3665,
+  "per_class_validation_accuracy": {
+    "Pepper__bell___Bacterial_spot": 0.965,
+    "Pepper__bell___healthy": 0.9834,
+    "Potato___Early_blight": 0.9841,
+    "Potato___Late_blight": 0.9096,
+    "Potato___healthy": 0.9677,
+    "Tomato_Bacterial_spot": 0.9229,
+    "Tomato_Early_blight": 0.5759,
+    "Tomato_Late_blight": 0.8006,
+    "Tomato_Leaf_Mold": 0.8811,
+    "Tomato_Septoria_leaf_spot": 0.8571,
+    "Tomato_Spider_mites_Two_spotted_spider_mite": 0.8253,
+    "Tomato__Target_Spot": 0.7701,
+    "Tomato__Tomato_YellowLeaf__Curl_Virus": 0.9227,
+    "Tomato__Tomato_mosaic_virus": 0.9615,
+    "Tomato_healthy": 0.9945
+  },
+  "macro_avg_f1": 0.8711,
+  "weighted_avg_f1": 0.8861,
+  "weak_classes_below_0_75": {
+    "Tomato_Early_blight": 0.5759
+  },
+  "trained_at": "2026-07-19T22:52:38",
+  "model_path": "D:\\Project\\smart-crop-advisory-system\\ml\\models\\leaf_disease_mobilenetv2.keras",
+  "labels_path": "D:\\Project\\smart-crop-advisory-system\\ml\\models\\labels.json",
+  "classification_report_path": "D:\\Project\\smart-crop-advisory-system\\ml\\models\\leaf_disease_classification_report.json",
+  "confusion_matrix_path": "D:\\Project\\smart-crop-advisory-system\\ml\\models\\leaf_disease_confusion_matrix.csv",
+  "training_history_path": "D:\\Project\\smart-crop-advisory-system\\ml\\models\\leaf_disease_training_history.json"
+}

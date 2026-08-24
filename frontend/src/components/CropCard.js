@@ -2,7 +2,7 @@ import React from "react";
 import { useLanguage } from "../i18n/LanguageContext";
 
 function CropCard({ crop, confidence, irrigation, imageSrc, advisory }) {
-  const { t } = useLanguage();
+  const { t, tv } = useLanguage();
   const generatedDate = new Date().toLocaleDateString("en-IN", {
     day: "2-digit",
     month: "short",
@@ -13,138 +13,210 @@ function CropCard({ crop, confidence, irrigation, imageSrc, advisory }) {
     : 0;
   const irrigationValue = Number.isFinite(Number(irrigation)) ? Number(irrigation).toFixed(4) : "-";
   const confidenceStyle = {
-    background: `conic-gradient(#c8ff67 ${confidencePercent * 3.6}deg, rgba(255, 255, 255, 0.08) 0deg)`,
+    background: `conic-gradient(#2F5233 ${confidencePercent * 3.6}deg, #E7E1D3 0deg)`,
+  };
+  const cropLabel = tv("crops", crop || "-");
+  const seasonLabel = tv("seasons", advisory?.seasonal_advice?.current_season || "-");
+  const stateLabel = tv("states", advisory?.seasonal_advice?.state || "-");
+  const normalizedCrop = String(crop || "").trim().toLowerCase();
+  const summaryText = crop
+    ? t("cropCard.summary", undefined, { crop: cropLabel, confidence: confidencePercent.toFixed(2) })
+    : t("cropCard.defaultReason");
+  const driverText = advisory?.explanation?.main_drivers?.length
+    ? `${t("cropCard.reasonPrefix")} ${advisory.explanation.main_drivers
+        .map((driver) => `${tv("features", driver.feature)}=${driver.value} (${Number(driver.importance).toFixed(2)}% ${t("cropCard.importance")})`)
+        .join(", ")}.`
+    : t("cropCard.defaultReason");
+  const translateFertilizerRecommendation = (item) => {
+    const nutrient = String(item?.nutrient || "").toLowerCase();
+    const status = String(item?.status || "").toLowerCase();
+    const key = `${nutrient}${status.charAt(0).toUpperCase()}${status.slice(1)}`;
+    return t(`cropCard.fertilizerMessages.${key}`, item?.recommendation || "-");
+  };
+  const translateIrrigationMessage = (level) => {
+    const keyByLevel = {
+      "very low": "irrigationVeryLow",
+      "low to moderate": "irrigationLowModerate",
+      moderate: "irrigationModerate",
+      high: "irrigationHigh",
+    };
+    return t(`cropCard.messages.${keyByLevel[String(level || "").toLowerCase()] || "irrigationModerate"}`);
+  };
+  const stateNote = (state) => t(`cropCard.stateNotes.${String(state || "").trim().toLowerCase()}`, t("cropCard.messages.localGuidance"));
+  const translateSeasonMessage = () => {
+    if (!advisory?.seasonal_advice) return "";
+    const params = { crop: cropLabel, season: seasonLabel };
+    return advisory.seasonal_advice.season_fit
+      ? t("cropCard.messages.seasonGood", undefined, params)
+      : t("cropCard.messages.seasonLessCommon", undefined, params);
+  };
+  const translateLocationMessage = () => {
+    const state = advisory?.seasonal_advice?.state;
+    const stateName = tv("states", state || "not specified");
+    const note = stateNote(state);
+    const isPreferred = String(advisory?.seasonal_advice?.location_message || "").toLowerCase().includes("commonly cultivated");
+    const isReview = String(advisory?.seasonal_advice?.location_message || "").toLowerCase().includes("may still work");
+    if (isPreferred) return t("cropCard.messages.stateCommon", undefined, { crop: cropLabel, state: stateName, note });
+    if (isReview) return t("cropCard.messages.stateReview", undefined, { crop: cropLabel, state: stateName, note });
+    return note;
+  };
+  const translateSeasonAdjustedMessage = () => {
+    const adjusted = advisory?.season_adjusted;
+    if (!adjusted) return "";
+    const adjustedCrop = tv("crops", adjusted.season_adjusted_crop);
+    const originalCrop = tv("crops", adjusted.original_ml_crop || crop);
+    const activeSeason = tv("seasons", adjusted.active_season);
+    return adjusted.changed_from_ml
+      ? t("cropCard.messages.seasonReview", undefined, { crop: adjustedCrop, season: activeSeason })
+      : t("cropCard.messages.seasonKept", undefined, { crop: originalCrop });
   };
 
   return (
     <div id="advisory-report" className="fade-in-up surface-card overflow-hidden">
-      <div className="border-b border-emerald-800/60 bg-emerald-950/55 p-5">
-        <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+      <div className="border-b border-surface-border bg-surface-card p-4">
+        <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
           <div>
-            <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-lime-200">Farmer Advisory Report</p>
-            <h3 className="mt-2 text-2xl font-semibold text-emerald-50">Smart Crop Recommendation Summary</h3>
-            <p className="mt-2 text-sm leading-6 text-emerald-100/68">
-              Formal report generated from crop ML prediction, irrigation model output, fertilizer rules, and season-aware advisory logic.
+            <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-accent-700">{t("cropCard.reportBadge")}</p>
+            <h3 className="mt-1 text-xl font-semibold text-text-heading">{t("cropCard.reportTitle")}</h3>
+            <p className="mt-1 text-xs leading-5 text-text-muted">
+              {t("cropCard.reportDesc")}
             </p>
           </div>
-          <div className="grid gap-2 rounded-2xl border border-emerald-700/40 bg-emerald-950/60 p-4 text-sm text-emerald-100/76 sm:min-w-[240px]">
+          <div className="grid gap-1.5 rounded-2xl border border-surface-border bg-surface-card p-3 text-xs text-text-muted sm:min-w-[220px]">
             <div className="flex justify-between gap-4">
-              <span>Generated</span>
-              <strong className="text-emerald-50">{generatedDate}</strong>
+              <span>{t("cropCard.generated")}</span>
+              <strong className="text-text-heading">{generatedDate}</strong>
             </div>
             <div className="flex justify-between gap-4">
-              <span>Season</span>
-              <strong className="text-emerald-50">{advisory?.seasonal_advice?.current_season || "-"}</strong>
+              <span>{t("cropCard.season")}</span>
+              <strong className="text-text-heading">{seasonLabel}</strong>
             </div>
             <div className="flex justify-between gap-4">
-              <span>State</span>
-              <strong className="text-emerald-50">{advisory?.seasonal_advice?.state || "-"}</strong>
+              <span>{t("cropCard.state")}</span>
+              <strong className="min-w-0 break-words text-right text-text-heading">{stateLabel}</strong>
             </div>
           </div>
         </div>
+        <div className="mt-4 grid gap-2 border-t border-accent-200 pt-3 sm:grid-cols-4">
+          {[
+            { label: t("cropCard.recommended"), value: cropLabel, tone: "text-accent-700" },
+            { label: t("cropCard.confidence"), value: `${confidencePercent.toFixed(1)}%`, tone: "text-text-heading" },
+            { label: t("cropCard.irrigationRequirement"), value: irrigationValue, tone: "text-text-heading" },
+            { label: t("cropCard.season"), value: seasonLabel, tone: "text-text-heading" },
+          ].map((item) => (
+            <div key={item.label} className="rounded-2xl border border-surface-border bg-surface-card px-3 py-2">
+              <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-text-subtle">{item.label}</p>
+              <p className={`mt-1 truncate text-sm font-semibold ${item.tone}`} title={String(item.value)}>{item.value}</p>
+            </div>
+          ))}
+        </div>
       </div>
-      <div className="grid gap-0 xl:grid-cols-[1.1fr,1fr]">
-        <div className="relative min-h-[320px] overflow-hidden">
-          <img src={imageSrc} alt={crop || "Predicted crop"} className="absolute inset-0 h-full w-full object-cover" />
-          <div className="absolute inset-0 bg-gradient-to-t from-emerald-950 via-emerald-950/45 to-transparent" />
-          <div className="absolute inset-x-0 bottom-0 p-6">
+      <div className="grid gap-0 xl:grid-cols-[0.85fr,1.15fr]">
+        <div className="relative min-h-[240px] overflow-hidden xl:min-h-[300px]">
+          <img src={imageSrc} alt={cropLabel} className="absolute inset-0 h-full w-full object-cover" />
+          <div className="absolute inset-0 bg-gradient-to-t from-primary-900 via-primary-900/30 to-transparent" />
+          <div className="absolute inset-x-0 bottom-0 p-4">
             <span className="section-badge">{t("cropCard.recommended")}</span>
-            <p className="mt-4 text-4xl font-bold capitalize text-lime-200 sm:text-5xl">{crop || "-"}</p>
-            <p className="mt-3 max-w-md text-sm leading-6 text-emerald-50/80">
-              {advisory?.explanation?.summary || "The advisory engine combined soil nutrients, weather, and seasonal context to select the best-fit crop."}
+            <p className="mt-3 text-3xl font-bold capitalize text-accent-700 sm:text-4xl">{cropLabel}</p>
+            <p className="mt-2 max-w-md text-xs leading-5 text-text-heading/80">
+              {summaryText}
             </p>
           </div>
         </div>
 
-        <div className="grid gap-4 p-6">
-          <div className="grid gap-4 sm:grid-cols-[180px,1fr]">
-            <div className="surface-card-soft flex flex-col items-center justify-center p-5 text-center">
+        <div className="grid gap-3 p-4">
+          <div className="grid gap-3 sm:grid-cols-[140px,1fr]">
+            <div className="surface-card-soft flex flex-col items-center justify-center p-3 text-center">
               <div className="flex h-28 w-28 items-center justify-center rounded-full p-2" style={confidenceStyle}>
-                <div className="flex h-full w-full items-center justify-center rounded-full bg-emerald-950 text-center shadow-inner shadow-black/30">
-                  <div>
-                    <p className="text-[11px] uppercase tracking-[0.2em] text-emerald-200/60">{t("cropCard.confidence")}</p>
-                    <p className="mt-1 text-2xl font-bold text-lime-200">{confidencePercent.toFixed(1)}%</p>
+                <div className="flex h-full w-full items-center justify-center rounded-full bg-surface-card text-center shadow-inner shadow-card">
+                  <div className="min-w-0 px-2">
+                    <p className="text-[9px] font-semibold uppercase tracking-[0.08em] text-text-muted">{t("cropCard.confidence")}</p>
+                    <p className="mt-1 text-xl font-bold leading-none text-accent-700">{confidencePercent.toFixed(1)}%</p>
                   </div>
                 </div>
               </div>
             </div>
 
             <div className="grid gap-3">
-              <div className="surface-card-soft p-4">
-                <p className="text-[11px] uppercase tracking-[0.2em] text-emerald-200/60">{t("cropCard.irrigationRequirement")}</p>
-                <div className="mt-2 flex flex-wrap items-end justify-between gap-3">
-                  <p className="text-3xl font-bold text-emerald-50">{irrigationValue}</p>
+              <div className="surface-card-soft p-3">
+                <p className="text-[11px] uppercase tracking-[0.2em] text-text-muted">{t("cropCard.irrigationRequirement")}</p>
+                <div className="mt-1 flex flex-wrap items-end justify-between gap-2">
+                  <p className="text-2xl font-bold text-text-heading">{irrigationValue}</p>
                   {advisory?.irrigation?.level ? (
-                    <span className="rounded-full border border-lime-300/20 bg-lime-300/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-lime-200">
-                      {advisory.irrigation.level}
+                    <span className="rounded-full border border-accent-200 bg-accent-50 px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-accent-700">
+                      {tv("statuses", advisory.irrigation.level)}
                     </span>
                   ) : null}
                 </div>
                 {advisory?.irrigation ? (
-                  <p className="mt-3 text-sm leading-6 text-emerald-100/72">{advisory.irrigation.recommendation}</p>
+                  <p className="mt-2 text-xs leading-5 text-text-muted">{translateIrrigationMessage(advisory.irrigation.level)}</p>
                 ) : null}
               </div>
 
-              <div className="grid gap-3 sm:grid-cols-2">
-                <div className="surface-card-soft p-4">
-                  <p className="text-[11px] uppercase tracking-[0.2em] text-emerald-200/60">{t("cropCard.currentSeason")}</p>
-                  <p className="mt-2 text-lg font-semibold text-emerald-50">{advisory?.seasonal_advice?.current_season || "-"}</p>
+              <div className="grid gap-3 sm:grid-cols-[minmax(120px,0.8fr),minmax(150px,1.2fr)]">
+                <div className="surface-card-soft min-w-0 p-3">
+                  <p className="text-[11px] uppercase tracking-[0.2em] text-text-muted">{t("cropCard.currentSeason")}</p>
+                  <p className="mt-1 break-words text-base font-semibold text-text-heading">{seasonLabel}</p>
                 </div>
-                <div className="surface-card-soft p-4">
-                  <p className="text-[11px] uppercase tracking-[0.2em] text-emerald-200/60">{t("cropCard.state")}</p>
-                  <p className="mt-2 text-lg font-semibold text-emerald-50">{advisory?.seasonal_advice?.state || "-"}</p>
+                <div className="surface-card-soft min-w-0 p-3">
+                  <p className="text-[11px] uppercase tracking-[0.2em] text-text-muted">{t("cropCard.state")}</p>
+                  <p className="mt-1 break-words text-base font-semibold leading-snug text-text-heading">{stateLabel}</p>
                 </div>
               </div>
             </div>
           </div>
 
-          <div className="surface-card-soft p-5">
+          <div className="surface-card-soft p-4">
             <div className="flex flex-wrap items-center justify-between gap-2">
               <div>
-                <p className="text-[11px] uppercase tracking-[0.2em] text-lime-300">{t("cropCard.aiExplanation")}</p>
-                <h4 className="mt-2 text-xl font-semibold text-emerald-50">{t("cropCard.why")}</h4>
+                <p className="text-[11px] uppercase tracking-[0.2em] text-accent-600">{t("cropCard.aiExplanation")}</p>
+                <h4 className="mt-1 text-lg font-semibold text-text-heading">{t("cropCard.why")}</h4>
               </div>
-              <span className="rounded-full border border-emerald-700/60 px-3 py-1 text-xs font-medium text-emerald-100/70">
+              <span className="rounded-full border border-surface-border px-3 py-1 text-xs font-medium text-text-muted">
                 {advisory?.seasonal_advice?.season_fit ? t("cropCard.goodFit") : t("cropCard.seasonContext")}
               </span>
             </div>
-            <p className="mt-3 text-sm leading-7 text-emerald-100/80">{advisory?.explanation?.plain_reason}</p>
+            <p className="mt-2 text-xs leading-5 text-text-muted">{driverText}</p>
 
-            <div className="mt-5 grid gap-3 sm:grid-cols-3">
+            <div className="mt-3 grid gap-3 sm:grid-cols-3">
               {advisory?.explanation?.main_drivers?.map((driver) => (
-                <div key={driver.feature} className="rounded-2xl border border-emerald-700/40 bg-emerald-950/65 p-4">
-                  <p className="text-[11px] uppercase tracking-[0.2em] text-emerald-200/65">{driver.feature}</p>
-                  <p className="mt-2 text-xl font-semibold text-lime-200">{driver.value}</p>
-                  <p className="mt-2 text-xs text-emerald-100/55">{Number(driver.importance).toFixed(2)}% {t("cropCard.importance")}</p>
+                <div key={driver.feature} className="rounded-2xl border border-surface-border bg-surface-card p-3">
+                  <p className="text-[11px] uppercase tracking-[0.2em] text-text-muted">{tv("features", driver.feature)}</p>
+                  <p className="mt-1 text-lg font-semibold text-accent-700">{driver.value}</p>
+                  <p className="mt-1 text-xs text-text-subtle">{Number(driver.importance).toFixed(2)}% {t("cropCard.importance")}</p>
                 </div>
               ))}
             </div>
           </div>
 
           {advisory?.season_adjusted ? (
-            <div className="surface-card-highlight p-5">
+            <div className="surface-card-highlight border-t border-accent-200 p-4">
               <div className="flex flex-wrap items-start justify-between gap-3">
                 <div>
-                  <p className="text-[11px] uppercase tracking-[0.2em] text-lime-200">Season-adjusted recommendation</p>
-                  <h4 className="mt-2 text-xl font-semibold text-emerald-50">{advisory.season_adjusted.season_adjusted_crop}</h4>
+                  <p className="text-[11px] uppercase tracking-[0.2em] text-accent-700">{t("cropCard.seasonAdjusted")}</p>
+                  <h4 className="mt-1 text-lg font-semibold text-text-heading">{tv("crops", advisory.season_adjusted.season_adjusted_crop)}</h4>
                 </div>
-                <span className="rounded-full border border-lime-300/20 bg-lime-300/10 px-3 py-1 text-xs font-semibold text-lime-100">
-                  {advisory.season_adjusted.active_season}
+                <span className="rounded-full border border-accent-200 bg-accent-50 px-3 py-1 text-xs font-semibold text-accent-800">
+                  {tv("seasons", advisory.season_adjusted.active_season)}
                 </span>
               </div>
-              <p className="mt-3 text-sm leading-7 text-emerald-100/78">{advisory.season_adjusted.message}</p>
-              <div className="mt-4 space-y-3">
+              <p className="mt-2 text-xs leading-5 text-text-muted">{translateSeasonAdjustedMessage()}</p>
+              <div className="mt-3 space-y-2">
                 {advisory.season_adjusted.ranking?.slice(0, 3).map((item) => (
-                  <div key={item.crop} className="rounded-2xl border border-emerald-700/40 bg-emerald-950/60 p-3">
+                  <div key={item.crop} className="rounded-2xl border border-surface-border bg-surface-card p-2.5">
                     <div className="flex items-center justify-between gap-3">
-                      <p className="font-semibold text-emerald-50">{item.crop}</p>
-                      <p className="text-sm font-semibold text-lime-200">{item.season_adjusted_score}%</p>
+                      <p className="font-semibold text-text-heading">{tv("crops", item.crop)}</p>
+                      <p className="text-sm font-semibold text-accent-700">{item.season_adjusted_score}%</p>
                     </div>
-                    <div className="mt-2 h-2 rounded-full bg-emerald-900/80">
-                      <div className="h-2 rounded-full bg-lime-300" style={{ width: `${Math.min(100, item.season_adjusted_score)}%` }} />
+                    <div className="mt-2 h-2 rounded-full bg-surface-muted">
+                      <div className="h-2 rounded-full bg-accent-500" style={{ width: `${Math.min(100, item.season_adjusted_score)}%` }} />
                     </div>
-                    <p className="mt-2 text-xs text-emerald-100/58">
-                      ML {item.ml_confidence}% | Input fit {item.input_suitability}% | Season {item.season_fit ? "fit" : "review"}
+                    <p className="mt-2 text-xs text-text-subtle">
+                      {t("cropCard.rankingMeta", undefined, {
+                        ml: item.ml_confidence,
+                        input: item.input_suitability,
+                        seasonStatus: item.season_fit ? t("cropCard.fit") : t("cropCard.review"),
+                      })}
                     </p>
                   </div>
                 ))}
@@ -155,48 +227,48 @@ function CropCard({ crop, confidence, irrigation, imageSrc, advisory }) {
       </div>
 
       {advisory ? (
-        <div className="grid gap-4 border-t border-emerald-800/60 p-5 lg:grid-cols-[1.15fr,0.85fr]">
-          <section className="surface-card-soft p-5">
-            <p className="text-[11px] uppercase tracking-[0.2em] text-lime-300">{t("cropCard.fertilizerAdvice")}</p>
-            <div className="mt-4 grid gap-3 md:grid-cols-3">
+        <div className="grid gap-3 border-t border-accent-200 p-4 lg:grid-cols-[1.15fr,0.85fr]">
+          <section className="surface-card-soft border-t border-accent-200 p-4">
+            <p className="text-[11px] uppercase tracking-[0.2em] text-accent-600">{t("cropCard.fertilizerAdvice")}</p>
+            <div className="mt-3 grid gap-3 md:grid-cols-3">
               {advisory.fertilizer?.map((item) => (
-                <div key={item.nutrient} className="rounded-2xl border border-emerald-700/40 bg-emerald-950/65 p-4">
+                <div key={item.nutrient} className="rounded-2xl border border-surface-border bg-surface-card p-3">
                   <div className="flex items-center justify-between gap-2">
-                    <strong className="text-emerald-50">{item.nutrient}</strong>
-                    <span className="rounded-full bg-lime-300/12 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-lime-200">
-                      {item.status}
+                    <strong className="text-text-heading">{tv("features", item.nutrient)}</strong>
+                    <span className="rounded-full bg-accent-50 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-accent-700">
+                      {tv("statuses", item.status)}
                     </span>
                   </div>
-                  <p className="mt-3 text-xs leading-5 text-emerald-100/60">
+                  <p className="mt-2 text-xs leading-5 text-text-muted">
                     {t("cropCard.current")} {item.value} | {t("cropCard.target")} {item.target}
                   </p>
-                  <p className="mt-3 text-sm leading-6 text-emerald-100/78">{item.recommendation}</p>
+                  <p className="mt-2 text-xs leading-5 text-text-muted">{translateFertilizerRecommendation(item)}</p>
                 </div>
               ))}
             </div>
           </section>
 
-          <section className="surface-card-soft p-5">
-            <p className="text-[11px] uppercase tracking-[0.2em] text-lime-300">{t("cropCard.seasonContext")}</p>
-            <div className="mt-4 space-y-4">
-              <div className="rounded-2xl border border-emerald-700/40 bg-emerald-950/65 p-4">
-                <p className="text-[11px] uppercase tracking-[0.18em] text-emerald-200/60">{t("cropCard.goodFit")}</p>
-                <p className="mt-2 text-xl font-semibold text-lime-200">
+          <section className="surface-card-soft p-4">
+            <p className="text-[11px] uppercase tracking-[0.2em] text-accent-600">{t("cropCard.seasonContext")}</p>
+            <div className="mt-3 space-y-3">
+              <div className="rounded-2xl border border-surface-border bg-surface-card p-3">
+                <p className="text-[11px] uppercase tracking-[0.18em] text-text-muted">{t("cropCard.goodFit")}</p>
+                <p className="mt-1 text-lg font-semibold text-accent-700">
                   {advisory.seasonal_advice?.season_fit ? t("cropCard.yes") : t("cropCard.no")}
                 </p>
                 {advisory.seasonal_advice?.season_priority ? (
-                  <p className="mt-2 text-xs capitalize text-emerald-100/58">{advisory.seasonal_advice.season_priority}</p>
+                  <p className="mt-2 text-xs capitalize text-text-subtle">{tv("statuses", advisory.seasonal_advice.season_priority)}</p>
                 ) : null}
               </div>
-              <p className="text-sm leading-7 text-emerald-100/80">{advisory.seasonal_advice?.season_message}</p>
-              <p className="text-sm leading-7 text-emerald-100/68">{advisory.seasonal_advice?.location_message}</p>
+              <p className="text-xs leading-5 text-text-muted">{translateSeasonMessage()}</p>
+              <p className="text-xs leading-5 text-text-muted">{translateLocationMessage()}</p>
               {advisory.seasonal_advice?.recommended_season_crops?.length ? (
-                <div className="rounded-2xl border border-emerald-700/40 bg-emerald-950/65 p-4">
-                  <p className="text-[11px] uppercase tracking-[0.18em] text-emerald-200/60">Season crop options</p>
+                <div className="rounded-2xl border border-surface-border bg-surface-card p-3">
+                  <p className="text-[11px] uppercase tracking-[0.18em] text-text-muted">{t("cropCard.seasonCropOptions")}</p>
                   <div className="mt-3 flex flex-wrap gap-2">
                     {advisory.seasonal_advice.recommended_season_crops.slice(0, 6).map((seasonCrop) => (
-                      <span key={seasonCrop} className="rounded-full border border-lime-300/15 bg-lime-300/8 px-3 py-1 text-xs capitalize text-lime-100">
-                        {seasonCrop}
+                      <span key={seasonCrop} className="rounded-full border border-accent-200 bg-accent-50 px-3 py-1 text-xs capitalize text-accent-800">
+                        {tv("crops", seasonCrop)}
                       </span>
                     ))}
                   </div>
@@ -206,38 +278,38 @@ function CropCard({ crop, confidence, irrigation, imageSrc, advisory }) {
           </section>
 
           {advisory.crop_comparison?.length ? (
-            <section className="surface-card-soft p-5 lg:col-span-2">
+            <section className="surface-card-soft border-t border-accent-200 p-4 lg:col-span-2">
               <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
                 <div>
-                  <p className="text-[11px] uppercase tracking-[0.2em] text-lime-300">Crop comparison mode</p>
-                  <h4 className="mt-2 text-xl font-semibold text-emerald-50">Wheat vs Rice vs Maize</h4>
+                  <p className="text-[11px] uppercase tracking-[0.2em] text-accent-600">{t("cropCard.cropComparisonMode")}</p>
+                  <h4 className="mt-1 text-lg font-semibold text-text-heading">{t("cropCard.comparisonTitle")}</h4>
                 </div>
-                <p className="text-sm text-emerald-100/62">Score combines entered climate, NPK, state, and season.</p>
+                <p className="text-xs text-text-muted">{t("cropCard.comparisonSubtitle")}</p>
               </div>
-              <div className="mt-4 grid gap-3 md:grid-cols-3">
+              <div className="mt-3 grid gap-3 md:grid-cols-3">
                 {advisory.crop_comparison.map((item) => (
-                  <div key={item.crop} className="rounded-2xl border border-emerald-700/40 bg-emerald-950/65 p-4">
+                  <div key={item.crop} className="rounded-2xl border border-surface-border bg-surface-card p-3">
                     <div className="flex items-start justify-between gap-3">
                       <div>
-                        <p className="text-lg font-semibold text-emerald-50">{item.crop}</p>
-                        <p className="mt-1 text-xs text-emerald-100/55">Water need: {item.water_need}</p>
+                        <p className="text-base font-semibold text-text-heading">{tv("crops", item.crop)}</p>
+                        <p className="mt-1 text-xs text-text-subtle">{t("cropCard.waterNeed")}: {tv("waterNeeds", item.water_need)}</p>
                       </div>
-                      <span className="rounded-full border border-lime-300/15 bg-lime-300/10 px-2.5 py-1 text-xs font-semibold text-lime-100">
+                      <span className="rounded-full border border-accent-200 bg-accent-50 px-2.5 py-1 text-xs font-semibold text-accent-800">
                         {item.suitability_score}%
                       </span>
                     </div>
-                    <div className="mt-3 h-2 rounded-full bg-emerald-900/80">
-                      <div className="h-2 rounded-full bg-lime-300" style={{ width: `${Math.min(100, item.suitability_score)}%` }} />
+                    <div className="mt-3 h-2 rounded-full bg-surface-muted">
+                      <div className="h-2 rounded-full bg-accent-500" style={{ width: `${Math.min(100, item.suitability_score)}%` }} />
                     </div>
                     <div className="mt-3 flex flex-wrap gap-2">
-                      <span className={`rounded-full px-2.5 py-1 text-xs ${item.season_fit ? "bg-lime-300/12 text-lime-100" : "bg-amber-300/12 text-amber-100"}`}>
-                        {item.season_fit ? "Season fit" : "Season review"}
+                      <span className={`rounded-full px-2.5 py-1 text-xs ${item.season_fit ? "bg-accent-50 text-accent-800" : "bg-warning-50 text-warning-700"}`}>
+                        {item.season_fit ? t("cropCard.seasonFit") : t("cropCard.seasonReview")}
                       </span>
-                      <span className="rounded-full bg-emerald-800/60 px-2.5 py-1 text-xs text-emerald-100/75">
-                        {item.fertilizer_focus}
+                      <span className="rounded-full bg-primary-50 px-2.5 py-1 text-xs text-text-muted">
+                        {t("cropCard.fertilizerFocus")}: {item.fertilizer_focus}
                       </span>
                     </div>
-                    <p className="mt-3 text-sm leading-6 text-emerald-100/72">{item.risk}</p>
+                    <p className="mt-2 text-xs leading-5 text-text-muted">{t(`cropCard.risks.${String(item.crop || normalizedCrop).toLowerCase()}`, item.risk)}</p>
                   </div>
                 ))}
               </div>

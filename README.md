@@ -2,7 +2,6 @@
 
 Final-year AI and Data Science project for crop decision support. The system helps farmers recommend a crop, estimate irrigation requirement, review fertilizer and season guidance, detect crop leaf disease symptoms, and view market support information from a browser dashboard.
 
-Built for: Daiwik Shetty, Shivam Singh, Tapeshkumar Thakur, Swaleha Deshmukh  
 Department: AI & Data Science, Thakur College of Engineering & Technology, Mumbai
 
 ## Problem Statement
